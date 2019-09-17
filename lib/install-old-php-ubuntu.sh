@@ -63,6 +63,8 @@ EOF
 
 export PHP_BUILD_EXTRA_MAKE_ARGUMENTS="-j$(nproc)"
 export PHP_BUILD_KEEP_OBJECT_FILES="on"
+export PHP_BUILD_XDEBUG_ENABLE="off"
+export PHP_BUILD_TMPDIR=/tmp/php-build
 
 MINOR_VERSION=$version
 case "$version" in
@@ -76,8 +78,21 @@ esac
 
 phpenv install -v -s $MINOR_VERSION
 
-# disable to xdebug
-rm $(phpenv root)/versions/${MINOR_VERSION}/etc/conf.d/xdebug.ini
+cd /tmp
+curl -L -O https://github.com/openssl/openssl/archive/OpenSSL_1_0_2p.tar.gz
+tar xvzf OpenSSL_1_0_2p.tar.gz
+cd openssl-OpenSSL_1_0_2p
+./config -fPIC shared --prefix=/opt/local/ --openssldir=/opt/local/openssl
+make && make test
+sudo make install
+
+cd $PHP_BUILD_TMPDIR/source/$MINOR_VERSION/ext/openssl
+cp config0.m4 config.m4
+phpize
+./configure --with-openssl=/opt/local
+make
+make test
+sudo make install
 
 sudo update-alternatives --install /usr/bin/php php $(phpenv root)/versions/${MINOR_VERSION}/bin/php 10
 sudo update-alternatives --install /usr/bin/phar phar $(phpenv root)/versions/${MINOR_VERSION}/bin/phar 10
