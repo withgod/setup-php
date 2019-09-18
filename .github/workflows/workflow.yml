@@ -37,3 +37,7 @@ jobs:
         php --version
         php -i
 
+    - name: Setup Composer
+      uses: nanasess/composer-installer-action@master
+    - name: composer list
+      run: composer list
