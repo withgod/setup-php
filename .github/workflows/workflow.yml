@@ -7,8 +7,10 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ubuntu-18.04, ubuntu-16.04]
-        php: [5.4, 5.5, 5.6, 7.1, 7.2, 7.3]
+        # operating-system: [ubuntu-18.04, ubuntu-16.04]
+        operating-system: [ubuntu-16.04]
+        # php: [5.4, 5.5, 5.6, 7.1, 7.2, 7.3]
+        php: [5.4]
     steps:
     - name: Checkout
       uses: actions/checkout@master
@@ -27,11 +29,61 @@ jobs:
     - name: npm test
       run: npm test
 
-    - name: Setup PHP
-      uses: ./
-      with:
-        php-version: ${{ matrix.php}}
+    # - name: Setup PHP
+    #   uses: ./
+    #   with:
+    #     php-version: ${{ matrix.php}}
+    
+# see https://gist.github.com/marulitua/f8932064ec5bfe6a5be9fadac7c5a141
+# see https://github.com/phpbrew/phpbrew/issues/1005
+    - name: apt-get update
+      if: matrix.php <= 5.4
+      run: |
+        sudo apt-get install curl ca-certificates gnupg
+        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-nss-dev libjpeg-dev re2c libxml2-dev \
+        libtidy-dev libxslt-dev libmcrypt-dev libreadline-dev libfreetype6-dev \
+        zlib1g-dev libzip-dev mysql-client
+        sudo ln -s /usr/include/x86_64-linux-gnu/curl /usr/local/include/curl
 
+    - name: setup openssl
+      if: matrix.php <= 5.4
+      run: |
+        cd /tmp
+        curl -L -O https://github.com/openssl/openssl/archive/OpenSSL_1_0_2p.tar.gz
+        tar xf OpenSSL_1_0_2p.tar.gz
+        cd openssl-OpenSSL_1_0_2p
+        ./config -fPIC shared --prefix=/usr/local/ --openssldir=/usr/local/openssl
+        make -j $(nproc)
+        sudo make install
+
+    - name: setup postgresql
+      if: matrix.php <= 5.4
+      run: |
+        cd /tmp
+        curl -L -O https://ftp.postgresql.org/pub/source/v9.6.15/postgresql-9.6.15.tar.bz2
+        tar xf postgresql-9.6.15.tar.bz2
+        cd postgresql-9.6.15
+        ./configure --prefix=/usr/local
+        make -j $(nproc)
+        sudo make install
+
+    - name: Setup phpbrew
+      if: matrix.php <= 5.4
+      run: |
+        export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+        curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
+        chmod +x phpbrew
+        sudo mv phpbrew /usr/local/bin/phpbrew
+        phpbrew init
+        phpbrew update
+        phpbrew --debug install --stdout -j $(nproc) 5.4.45 +default +dbs +opcache -- --with-openssl=shared --with-pgsql=/usr/local
+        source ~/.phpbrew/bashrc
+        phpbrew use 5.4.45
+        php --version
+        php -i
     - name: php --version
       run: |
         php --version
