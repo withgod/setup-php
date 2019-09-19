@@ -44,6 +44,6 @@ jobs:
         php -i
 
     - name: Setup Composer
-      uses: nanasess/composer-installer-action@master
+      uses: nanasess/composer-installer-action@php-matrix
     - name: composer list
       run: composer list
