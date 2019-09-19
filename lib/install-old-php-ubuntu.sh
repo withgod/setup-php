@@ -11,7 +11,7 @@ install_openssl1_0()
     curl -L -O https://github.com/openssl/openssl/archive/OpenSSL_1_0_2p.tar.gz
     tar xf OpenSSL_1_0_2p.tar.gz
     cd openssl-OpenSSL_1_0_2p
-    ./config no-shared --prefix=/usr/local --openssldir=/usr/local/openssl
+    ./config -fPIC shared --prefix=/usr/local --openssldir=/usr/local/openssl
     make -j $(nproc)
     sudo make install
 }
@@ -25,6 +25,17 @@ install_postgresql()
     ./configure --prefix=/usr/local
     make -j $(nproc)
     sudo make install
+}
+
+install_ext_openssl()
+{
+    cd $PHP_BUILD_TMPDIR/source/$MINOR_VERSION/ext/openssl
+    cp config0.m4 config.m4
+    $(phpenv root)/versions/${MINOR_VERSION}/bin/phpize
+    ./configure --with-php-config=$(phpenv root)/versions/${MINOR_VERSION}/bin/php-config
+    make -j $(nproc)
+    sudo make install
+    echo "extension=openssl.so" > $(phpenv root)/versions/${MINOR_VERSION}/etc/conf.d/openssl.ini
 }
 
 echo "RUNNER_TOOL_CACHE: ${RUNNER_TOOL_CACHE}"
@@ -62,8 +73,6 @@ cat <<EOF > $(phpenv root)/plugins/php-build/share/php-build/default_configure_o
 --with-bz2
 --enable-intl
 --with-kerberos
---with-openssl=/usr/local/openssl
---with-libdir=lib
 --enable-soap
 --enable-xmlreader
 --with-xsl
@@ -103,6 +112,7 @@ case "$version" in
 esac
 
 phpenv install -v -s $MINOR_VERSION
+install_ext_openssl
 
 sudo update-alternatives --install /usr/bin/php php $(phpenv root)/versions/${MINOR_VERSION}/bin/php 10
 sudo update-alternatives --install /usr/bin/phar phar $(phpenv root)/versions/${MINOR_VERSION}/bin/phar 10
@@ -116,5 +126,4 @@ sudo update-alternatives --set phar $(phpenv root)/versions/${MINOR_VERSION}/bin
 sudo update-alternatives --set php-cgi $(phpenv root)/versions/${MINOR_VERSION}/bin/php-cgi
 sudo update-alternatives --set phar.phar $(phpenv root)/versions/${MINOR_VERSION}/bin/phar.phar
 
-php --version
 php -i
