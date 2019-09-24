@@ -99,7 +99,7 @@ case "$release" in
     ;;
     "xenial" )
         sudo apt-fast purge 'libssl1.1'
-        sudo apt-fast install -y postgresql-common libpq5 libpq-dev
+        sudo apt-fast install -y openssl ca-certificates postgresql-common libpq5 libpq-dev
         echo "--with-pgsql" >> $(phpenv root)/plugins/php-build/share/php-build/default_configure_options
     ;;
 esac
