@@ -54,7 +54,10 @@ sudo apt-fast install -y libcurl4-nss-dev libjpeg-dev re2c libxml2-dev \
 
 sudo ln -s /usr/include/x86_64-linux-gnu/curl /usr/local/include/curl
 
-install_openssl1_0
+if [ $release = 'bionic' ]
+then
+    install_openssl1_0
+fi
 install_postgresql
 
 export PATH="$RUNNER_TOOL_CACHE/.phpenv/bin:$PATH"
