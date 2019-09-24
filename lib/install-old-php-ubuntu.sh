@@ -54,12 +54,6 @@ sudo apt-fast install -y libcurl4-nss-dev libjpeg-dev re2c libxml2-dev \
 
 sudo ln -s /usr/include/x86_64-linux-gnu/curl /usr/local/include/curl
 
-if [ $release = 'bionic' ]
-then
-    install_openssl1_0
-fi
-install_postgresql
-
 export PATH="$RUNNER_TOOL_CACHE/.phpenv/bin:$PATH"
 eval "$(phpenv init -)"
 
@@ -94,9 +88,19 @@ cat <<EOF > $(phpenv root)/plugins/php-build/share/php-build/default_configure_o
 --disable-debug
 --enable-bcmath
 --with-freetype-dir=/usr
---with-pgsql=/usr/local
 --with-pdo-pgsql
 EOF
+
+case "$release" in
+    "bionic" )
+        install_openssl1_0
+        install_postgresql
+        echo "--with-pgsql=/usr/local" >> $(phpenv root)/plugins/php-build/share/php-build/default_configure_options
+    ;;
+    "xenial" )
+        echo "--with-pgsql" >> $(phpenv root)/plugins/php-build/share/php-build/default_configure_options
+    ;;
+esac
 
 export PHP_BUILD_EXTRA_MAKE_ARGUMENTS="-j$(nproc)"
 export PHP_BUILD_KEEP_OBJECT_FILES="on"
