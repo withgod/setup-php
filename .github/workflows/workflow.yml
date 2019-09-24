@@ -28,6 +28,11 @@ jobs:
     - name: npm test
       run: npm test
 
+    - name: openssl version
+      run: |
+        openssl version
+        dpkg -l | grep ssl
+
     - name: Setup PHP
       uses: ./
       with:
