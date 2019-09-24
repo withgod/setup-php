@@ -98,6 +98,7 @@ case "$release" in
         echo "--with-pgsql=/usr/local" >> $(phpenv root)/plugins/php-build/share/php-build/default_configure_options
     ;;
     "xenial" )
+        sudo apt-fast purge 'libssl1.1'
         sudo apt-fast install -y postgresql-common libpq5 libpq-dev
         echo "--with-pgsql" >> $(phpenv root)/plugins/php-build/share/php-build/default_configure_options
     ;;

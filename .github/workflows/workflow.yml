@@ -32,6 +32,7 @@ jobs:
       run: |
         openssl version
         dpkg -l | grep ssl
+        apt-cache rdepends libssl1.1
 
     - name: Setup PHP
       uses: ./
