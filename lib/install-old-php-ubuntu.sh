@@ -98,6 +98,9 @@ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
 MINOR_VERSION=$version
 case "$version" in
+    "5.3" )
+        MINOR_VERSION="5.3.29"
+        ;;
     "5.4" )
         MINOR_VERSION="5.4.45"
         ;;

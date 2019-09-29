@@ -3,6 +3,7 @@ Param(
 )
 $InstallVersion = "7.3.9"
 switch ($version) {
+    "5.3" { $InstallVersion = "5.3.29" }
     "5.4" { $InstallVersion = "5.4.45" }
     "5.5" { $InstallVersion = "5.5.38" }
     "5.6" { $InstallVersion = "5.6.40" }
