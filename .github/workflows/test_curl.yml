@@ -1,0 +1,69 @@
+## Rest of the file pulled from https://github.com/actions/setup-python/blob/master/.github/workflows/workflow.yml
+name: Main workflow
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
+    paths:
+      - '**'
+      - '!*.md'
+  pull_request:
+    paths:
+      - '**'
+      - '!*.md'
+jobs:
+  run:
+    name: Run
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-18.04, ubuntu-16.04 ]
+        php: [5.4]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    # - name: Set Node.js 10.x
+    #   uses: actions/setup-node@master
+    #   with:
+    #     version: 10.x
+
+    # - name: npm install
+    #   run: npm install
+
+    # - name: Lint
+    #   if: matrix.operating-system == 'ubuntu-18.04' || matrix.operating-system == 'ubuntu-16.04'
+    #   run: npm run format-check
+
+    # - name: npm test
+    #   if: matrix.operating-system == 'ubuntu-18.04' || matrix.operating-system == 'ubuntu-16.04'
+    #   run: npm test
+
+    # - name: Setup PHP
+    #   uses: ./
+    #   with:
+    #     php-version: ${{ matrix.php}}
+
+    - name: curl
+      run: |
+        export version=7.2.12
+        export PHP_BUILD_TMPDIR=/tmp/php-build
+        if [ ! -d "${PHP_BUILD_TMPDIR}/packages" ]
+        then
+          mkdir -p ${PHP_BUILD_TMPDIR}/packages
+        fi
+        if [ ! -d "${PHP_BUILD_TMPDIR}/source" ]
+        then
+          mkdir -p ${PHP_BUILD_TMPDIR}/source
+        fi
+        if [ ! -d "${PHP_BUILD_TMPDIR}/source/${version}" ]
+        then
+          mkdir -p ${PHP_BUILD_TMPDIR}/source/${version}
+        fi
+        wget --retry-connrefused --tries=10 --timeout=30  --inet4-only -P ${PHP_BUILD_TMPDIR}/packages/ https://secure.php.net/distributions/php-${version}.tar.bz2
+        tar -x --strip-components 1 -f ${PHP_BUILD_TMPDIR}/packages/php-${version}.tar.bz2 -C ${PHP_BUILD_TMPDIR}/source/${version}
+
