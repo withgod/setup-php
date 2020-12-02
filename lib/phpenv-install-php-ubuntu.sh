@@ -124,11 +124,13 @@ sudo update-alternatives --install /usr/bin/phar phar $(phpenv root)/versions/${
 # sudo update-alternatives --install /usr/bin/phpdbg phpdbg $(phpenv root)/versions/${version}/bin/phpdbg 10
 sudo update-alternatives --install /usr/bin/php-cgi php-cgi $(phpenv root)/versions/${version}/bin/php-cgi 10
 sudo update-alternatives --install /usr/bin/phar.phar phar.phar $(phpenv root)/versions/${version}/bin/phar.phar 10
+sudo update-alternatives --install /usr/bin/phpize phpize $(phpenv root)/versions/${version}/bin/phpize 10
 
 sudo update-alternatives --set php $(phpenv root)/versions/${version}/bin/php
 sudo update-alternatives --set phar $(phpenv root)/versions/${version}/bin/phar
 # sudo update-alternatives --set phpdbg $(phpenv root)/versions/${version}/bin/phpdbg
 sudo update-alternatives --set php-cgi $(phpenv root)/versions/${version}/bin/php-cgi
 sudo update-alternatives --set phar.phar $(phpenv root)/versions/${version}/bin/phar.phar
+sudo update-alternatives --set phpize $(phpenv root)/versions/${version}/bin/phpize
 
 php -i
